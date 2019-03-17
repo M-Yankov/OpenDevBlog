@@ -30,9 +30,7 @@
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    this.configuration.GetConnectionString("DefaultConnection")));
+            this.UseDatabase(services);
 
             services.Configure<IdentityOptions>(identity =>
             {
@@ -71,7 +69,7 @@
             using (IServiceScope scope = app.ApplicationServices.CreateScope())
             {
                 IApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
-                dbContext.Migrate();
+                this.MigrateDataBase(dbContext);
             }
 
             app.UseStaticFiles();
@@ -86,5 +84,12 @@
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+
+        public virtual void MigrateDataBase(IApplicationDbContext databaseContext) =>
+            databaseContext.Migrate();
+
+        public virtual void UseDatabase(IServiceCollection services) =>
+            services.AddDbContext<ApplicationDbContext>(options =>
+                 options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
     }
 }
