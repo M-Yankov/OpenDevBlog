@@ -45,11 +45,10 @@ namespace OpenDevBlog.Tests.UI
         }
 
         [Fact] 
-        public async Task TesstMe()
+        public async Task HomePageTest()
         {
             var response = await client.GetAsync("/");
             response.EnsureSuccessStatusCode();
         }
-    } 
-    
+    }
 }
