@@ -39,7 +39,7 @@
                 identity.Password.RequireUppercase = false;
                 identity.Password.RequireNonAlphanumeric = false;
             });
-
+            
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
             services.AddDefaultIdentity<IdentityUser>()
@@ -68,8 +68,10 @@
 
             using (IServiceScope scope = app.ApplicationServices.CreateScope())
             {
-                IApplicationDbContext dbContext = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
-                this.MigrateDataBase(dbContext);
+                IApplicationDbContext databaseContext = scope.ServiceProvider
+                    .GetRequiredService<IApplicationDbContext>();
+
+                this.MigrateDataBase(databaseContext);
             }
 
             app.UseStaticFiles();

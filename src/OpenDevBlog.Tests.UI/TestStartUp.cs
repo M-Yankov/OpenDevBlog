@@ -6,12 +6,12 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
-    using Web.Data;
     using Web;
+    using Web.Data;
 
-    public class TestStartUp : Startup
+    public class TestStartup : Startup
     {
-        public TestStartUp(IConfiguration configuration)
+        public TestStartup(IConfiguration configuration)
             : base(configuration)
         {
         }
