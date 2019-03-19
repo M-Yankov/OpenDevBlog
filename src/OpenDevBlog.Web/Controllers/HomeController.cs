@@ -2,13 +2,21 @@
 {
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
     using OpenDevBlog.Web.Models;
 
     public class HomeController : Controller
     {
+        private int value = 0;
+
+        public HomeController(IConfiguration configuration)
+        {
+            value = configuration.GetValue<int>("MyValue");
+        }
+
         public IActionResult Index()
         {
-            return this.View();
+            return this.View(value);
         }
 
         public IActionResult Privacy()

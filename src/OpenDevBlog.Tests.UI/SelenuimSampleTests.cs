@@ -70,6 +70,10 @@
                 string expected = typeof(Web.Startup).Assembly.GetName().Name;
 
                 Assert.Equal(expected, webElement.Text);
+
+                string appSettingValue = driver.FindElementById("myvalue").Text;
+                const string ExpectedAppSettingsValue = "44";
+                Assert.Equal(ExpectedAppSettingsValue, appSettingValue);
             }
         }
     }
