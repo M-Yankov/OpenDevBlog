@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.438
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenDevBlog.Web", "OpenDevBlog.Web\OpenDevBlog.Web.csproj", "{AB9BDA6E-25C0-44EF-AACE-D116BFC6A1E8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1093F37E-A71A-40A9-A064-CD3D0EACCE17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDevBlog.Tests.UI", "OpenDevBlog.Tests.UI\OpenDevBlog.Tests.UI.csproj", "{BF5785C8-0C29-4127-AA75-4497F2040D96}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{AB9BDA6E-25C0-44EF-AACE-D116BFC6A1E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB9BDA6E-25C0-44EF-AACE-D116BFC6A1E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AB9BDA6E-25C0-44EF-AACE-D116BFC6A1E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF5785C8-0C29-4127-AA75-4497F2040D96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF5785C8-0C29-4127-AA75-4497F2040D96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF5785C8-0C29-4127-AA75-4497F2040D96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF5785C8-0C29-4127-AA75-4497F2040D96}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BF5785C8-0C29-4127-AA75-4497F2040D96} = {1093F37E-A71A-40A9-A064-CD3D0EACCE17}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {10C636BE-1BCE-4149-8A5B-F932A51C581C}

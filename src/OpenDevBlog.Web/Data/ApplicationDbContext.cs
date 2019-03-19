@@ -14,5 +14,10 @@
         {
             this.Database.Migrate();
         }
+
+        public void EnsureCreated()
+        {
+            this.Database.EnsureCreated();
+        }
     }
 }

@@ -8,5 +8,7 @@
         DbSet<IdentityUser> Users { get; set; }
 
         void Migrate();
+
+        void EnsureCreated();
     }
 }
