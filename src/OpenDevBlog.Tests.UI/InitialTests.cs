@@ -37,7 +37,7 @@ namespace OpenDevBlog.Tests.UI
             this.client = this.server.CreateClient();
         }
 
-        [Fact]
+        [Fact(Skip = "It is using real database! Need more development")]
         public async Task HomePageTest()
         {
             HttpResponseMessage response = await this.client.GetAsync("/");
