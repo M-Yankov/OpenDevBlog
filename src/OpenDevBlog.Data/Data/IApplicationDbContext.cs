@@ -1,4 +1,4 @@
-﻿namespace OpenDevBlog.Web.Data
+﻿namespace OpenDevBlog.Data
 {
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;

@@ -9,7 +9,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-    using OpenDevBlog.Web.Data;
+    using OpenDevBlog.Data;
 
     public class Startup
     {

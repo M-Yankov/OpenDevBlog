@@ -5,9 +5,8 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
-
+    using OpenDevBlog.Data;
     using Web;
-    using Web.Data;
 
     public class TestStartup : Startup
     {
