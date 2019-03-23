@@ -1,5 +1,7 @@
 ﻿namespace OpenDevBlog.Web
 {
+    using System.Threading.Tasks;
+
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
@@ -9,16 +11,15 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
+
     using OpenDevBlog.Data;
+    using OpenDevBlog.Models.Database;
 
     public class Startup
     {
         private readonly IConfiguration configuration;
 
-        public Startup(IConfiguration configuration)
-        {
-            this.configuration = configuration;
-        }
+        public Startup(IConfiguration configuration) => this.configuration = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -39,10 +40,10 @@
                 identity.Password.RequireUppercase = false;
                 identity.Password.RequireNonAlphanumeric = false;
             });
-            
+
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 
-            services.AddDefaultIdentity<IdentityUser>()
+            services.AddDefaultIdentity<ApplicationUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -71,7 +72,9 @@
                 IApplicationDbContext databaseContext = scope.ServiceProvider
                     .GetRequiredService<IApplicationDbContext>();
 
-                this.MigrateDataBase(databaseContext);
+                this.MigrateDataBaseAsync(databaseContext)
+                    .GetAwaiter()
+                    .GetResult();
             }
 
             app.UseStaticFiles();
@@ -87,10 +90,10 @@
             });
         }
 
-        public virtual void MigrateDataBase(IApplicationDbContext databaseContext) =>
-            databaseContext.Migrate();
+        protected virtual async Task MigrateDataBaseAsync(IApplicationDbContext databaseContext) =>
+            await databaseContext.MigrateAsync();
 
-        public virtual void UseDatabase(IServiceCollection services) =>
+        protected virtual void UseDatabase(IServiceCollection services) =>
             services.AddDbContext<ApplicationDbContext>(options =>
                  options.UseSqlServer(this.configuration.GetConnectionString("DefaultConnection")));
     }

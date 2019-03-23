@@ -1,14 +1,26 @@
 ﻿namespace OpenDevBlog.Data
 {
-    using Microsoft.AspNetCore.Identity;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     using Microsoft.EntityFrameworkCore;
+
+    using OpenDevBlog.Models.Database;
 
     public interface IApplicationDbContext
     {
-        DbSet<IdentityUser> Users { get; set; }
+        DbSet<ApplicationUser> Users { get; set; }
 
-        void Migrate();
+        DbSet<Article> Articles { get; set; }
 
-        void EnsureCreated();
+        DbSet<CategoryArticle> CategoryArticles { get; set; }
+
+        DbSet<Category> Categories { get; set; }
+
+        Task MigrateAsync();
+
+        Task EnsureCreatedAsync();
+
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }
