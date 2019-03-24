@@ -66,11 +66,11 @@
 
         private void UpdateDatesBeforeSaveEntities()
         {
-            IDictionary<EntityState, IAuditInfo> entriesForUpdate = this.ChangeTracker
+            IEnumerable<(EntityState state, IAuditInfo entity)> entriesForUpdate = this.ChangeTracker
                .Entries()
                .Where(x => x.Entity is IAuditInfo
                    && (x.State == EntityState.Modified || x.State == EntityState.Added))
-               .ToDictionary(x => x.State, x => (IAuditInfo)x);
+               .Select(x => (x.State, (IAuditInfo)x.Entity));
 
             foreach ((EntityState state, IAuditInfo entity) in entriesForUpdate)
             {
@@ -87,7 +87,7 @@
 
         private IEnumerable<Category> GetDefaultCategories()
         {
-            string[] categoryNames = new string[] 
+            string[] categoryNames = new string[]
             {
                 "Programing",
                 "Web",
