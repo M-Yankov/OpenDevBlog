@@ -8,8 +8,10 @@
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Internal;
     using Microsoft.Extensions.DependencyInjection;
+
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
+
     using Xunit;
 
     public class SelenuimSampleTests : IDisposable
@@ -36,7 +38,7 @@
                     {
                         IHostingEnvironment hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
                         StartupMethods startupMethods = StartupLoader.LoadMethods(
-                            serviceProvider, 
+                            serviceProvider,
                             typeof(TestStartup),
                             hostingEnvironment.EnvironmentName);
 

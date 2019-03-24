@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenDevBlog.Data\OpenDevBlog.Data.csproj" />
     <ProjectReference Include="..\OpenDevBlog.Web\OpenDevBlog.Web.csproj" />
   </ItemGroup>
 

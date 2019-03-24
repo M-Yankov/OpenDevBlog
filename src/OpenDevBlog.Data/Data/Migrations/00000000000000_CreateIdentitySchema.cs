@@ -1,4 +1,4 @@
-﻿namespace OpenDevBlog.Web.Data.Migrations
+﻿namespace OpenDevBlog.Data.Migrations
 {
     using System;
     using Microsoft.EntityFrameworkCore.Metadata;

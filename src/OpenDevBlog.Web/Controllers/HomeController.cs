@@ -3,20 +3,20 @@
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Configuration;
-    using OpenDevBlog.Web.Models;
+    using OpenDevBlog.Web.ViewModels;
 
     public class HomeController : Controller
     {
-        private int value = 0;
+        private readonly IConfiguration configuration;
 
         public HomeController(IConfiguration configuration)
         {
-            value = configuration.GetValue<int>("MyValue");
+            this.configuration = configuration;
         }
 
         public IActionResult Index()
         {
-            return this.View(value);
+            return this.View(this.configuration.GetValue<int>("MyValue"));
         }
 
         public IActionResult Privacy()

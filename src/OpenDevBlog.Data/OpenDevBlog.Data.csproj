@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Data\Migrations\20190320212015_InitialDataModels.cs" />
+    <Compile Remove="Data\Migrations\20190322190409_InitialDataModels.cs" />
+    <Compile Remove="Data\Migrations\20190323122220_InitialDataModels.cs" />
+    <Compile Remove="Data\Migrations\20190323130150_InitialDataModels.cs" />
+    <Compile Remove="Data\Migrations\20190323130633_InitialDataModels.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OpenDevBlog.Models\OpenDevBlog.Models.csproj" />
+  </ItemGroup>
+
+</Project>
