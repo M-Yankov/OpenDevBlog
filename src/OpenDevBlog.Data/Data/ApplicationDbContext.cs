@@ -58,6 +58,10 @@
 
             builder.Entity<Category>()
                 .HasKey(x => x.Id);
+
+            IEnumerable<Category> categories = this.GetDefaultCategories();
+            builder.Entity<Category>()
+                .HasData(categories);
         }
 
         private void UpdateDatesBeforeSaveEntities()
@@ -79,6 +83,39 @@
                     entity.ModifiedOn = DateTime.UtcNow;
                 }
             }
+        }
+
+        private IEnumerable<Category> GetDefaultCategories()
+        {
+            string[] categoryNames = new string[] 
+            {
+                "Programing",
+                "Web",
+                "Desktop",
+                "Front-end",
+                "Administration",
+                "Operating System",
+                "Game development",
+                "UX",
+                "Design",
+                "Code Quality",
+                "Software Engineering",
+                "Agile",
+                "Source control"
+            };
+
+            ICollection<Category> defaultCategories = new HashSet<Category>();
+            for (int i = 0; i < categoryNames.Length; i++)
+            {
+                defaultCategories.Add(new Category()
+                {
+                    Id = i + 1,
+                    Name = categoryNames[i],
+                    CreatedOn = DateTime.UtcNow
+                });
+            }
+
+            return defaultCategories;
         }
     }
 }
