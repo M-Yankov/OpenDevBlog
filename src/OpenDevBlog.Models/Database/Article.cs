@@ -5,24 +5,16 @@
     using System.ComponentModel.DataAnnotations;
 
     using Enums;
+    using OpenDevBlog.Models.Database.Base;
 
-    public class Article
+    public class Article : BaseDeletableModel<int>, IAuditInfo, IDeletableModel
     {
-        [Key]
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string Title { get; set; }
 
         [MaxLength(100_000)]
         public string Content { get; set; }
-
-        [Required]
-        public DateTime UpdatedOn { get; set; }
-
-        [Required]
-        public DateTime CreatedOn { get; set; }
 
         [Required]
         public string AuthorId { get; set; }

@@ -4,6 +4,7 @@
     using System.Threading.Tasks;
 
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.ChangeTracking;
 
     using OpenDevBlog.Models.Database;
 
@@ -17,10 +18,16 @@
 
         DbSet<Category> Categories { get; set; }
 
+        DbSet<TEntity> Set<TEntity>() where TEntity : class;
+
+        EntityEntry<TEntity> Entry<TEntity>(TEntity entity) where TEntity : class;
+
+        EntityEntry<TEntity> Attach<TEntity>(TEntity entity) where TEntity : class;
+
         Task MigrateAsync();
 
         Task EnsureCreatedAsync();
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

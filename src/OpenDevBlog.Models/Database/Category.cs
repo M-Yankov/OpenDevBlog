@@ -3,11 +3,10 @@
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
 
-    public class Category
-    {
-        [Key]
-        public int Id { get; set; }
+    using OpenDevBlog.Models.Database.Base;
 
+    public class Category : BaseDeletableModel<int>
+    {
         [MaxLength(100)]
         public string Name { get; set; }
 

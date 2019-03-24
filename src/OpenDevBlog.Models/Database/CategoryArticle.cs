@@ -1,8 +1,8 @@
 ﻿namespace OpenDevBlog.Models.Database
 {
-    using System.ComponentModel.DataAnnotations;
+    using OpenDevBlog.Models.Database.Base;
 
-    public class CategoryArticle
+    public class CategoryArticle : BaseDeletableModel<int>
     {
         public int CategoryId { get; set; }
 

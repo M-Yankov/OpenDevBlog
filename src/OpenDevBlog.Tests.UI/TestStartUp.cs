@@ -50,7 +50,7 @@
             article.Title = "Approved Article;";
             article.Content = "<div> Hello World </div>";
             article.CreatedOn = DateTime.UtcNow.AddDays(-2);
-            article.UpdatedOn = article.CreatedOn;
+            article.ModifiedOn = article.CreatedOn;
             article.Status = Models.Enums.ArticleStatus.Approved;
             article.ReviewDate = article.CreatedOn.AddDays(1);
             article.ReviewerId = admin.Id;
@@ -61,7 +61,7 @@
             article2.Title = "Undefined Test not working";
             article2.Content = "<div> How to Make a ....? </div>";
             article2.CreatedOn = DateTime.UtcNow.AddDays(-2);
-            article2.UpdatedOn = article2.CreatedOn;
+            article2.ModifiedOn = article2.CreatedOn;
             article2.Status = Models.Enums.ArticleStatus.Pending;
             article2.ReviewDate = article2.CreatedOn.AddDays(1);
             article2.Author = anonymouseAuthor;
