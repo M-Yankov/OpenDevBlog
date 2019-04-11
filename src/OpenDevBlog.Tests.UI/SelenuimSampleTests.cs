@@ -1,22 +1,26 @@
 ﻿namespace OpenDevBlog.Tests.UI
 {
     using System;
-    using System.Collections.ObjectModel;
     using System.Collections.Generic;
-    using System.Globalization;
+    using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
     using System.Threading;
+
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Internal;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
+
     using OpenDevBlog.Data;
+    using OpenDevBlog.Web.Models.Articles;
+
     using OpenQA.Selenium;
     using OpenQA.Selenium.Chrome;
+
     using Xunit;
-    using Microsoft.AspNetCore.Identity;
 
     public class SelenuimSampleTests : IDisposable
     {
@@ -102,22 +106,25 @@
                 webElement.SendKeys($"<div> {expectedTest} </div>");
                 driver.FindElementById("btn-preview").Click();
 
-                string text = driver.FindElementByCssSelector("#preview").Text;
+                var webElement1 = driver.FindElementByTagName("body");
+                bool test1 = webElement1.Enabled;
+                string preview = driver.FindElementByCssSelector("#preview").Text;
 
-                Assert.Equal(expectedTest, text);
+                Assert.Equal(expectedTest, preview);
 
-                driver.FindElementByCssSelector("form input[type=submit]").Click();
-
+                using (new NoReloadVerificationContext(driver))
+                {
+                    driver.FindElementByCssSelector("form input[type=submit]").Click();
+                }
+                
+                bool test = webElement1.Enabled;
                 const string Email = "test@test.com";
                 const string ArticleTitle = "Sample Selenium title";
-                driver.FindElementByCssSelector("[name=title]").SendKeys(ArticleTitle);
-                driver.FindElementByCssSelector("[name=email]").SendKeys(Email);
-                driver.FindElementByCssSelector("[name=names]").SendKeys("Testing with selenium");
+                driver.FindElementByCssSelector($"[name={nameof(ArticleCreateModel.Title)}]").SendKeys(ArticleTitle);
+                driver.FindElementByCssSelector($"[name={nameof(ArticleCreateModel.Email)}]").SendKeys(Email);
+                driver.FindElementByCssSelector($"[name={nameof(ArticleCreateModel.Names)}]").SendKeys("Testing with selenium");
 
                 driver.FindElementByCssSelector("form input[type=submit]").Click();
-
-                const string expectedToEndsWith = "/Articles/Success";
-                Assert.EndsWith(expectedToEndsWith, driver.Url);
 
                 OpenDevBlog.Models.Database.ApplicationUser user;
                 using (IServiceScope scope = this.webHost.Services.CreateScope())
@@ -128,6 +135,9 @@
                         .GetAwaiter()
                         .GetResult();
                 }
+
+                const string expectedToEndsWith = "/Articles/Success";
+                Assert.EndsWith(expectedToEndsWith, driver.Url);
 
                 Assert.NotNull(user);
                 Assert.EndsWith(Email, user.UserName);
@@ -175,7 +185,7 @@
                 Assert.Equal(expectedArticlesCount, acutualCount);
             }
         }
-        
+
         [Fact]
         public void ExpectToAccessArticlesForReviewPage()
         {
@@ -185,7 +195,7 @@
 
             using (IServiceScope scope = this.webHost.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
             {
-                var roleManager = scope.ServiceProvider
+                RoleManager<IdentityRole> roleManager = scope.ServiceProvider
                     .GetRequiredService<RoleManager<IdentityRole>>();
 
                 roleManager.CreateAsync(new IdentityRole(RoleName))
@@ -193,10 +203,10 @@
                     .GetResult()
                     .VerifyIdentityResult();
 
-                var usm = scope.ServiceProvider
+                UserManager<Models.Database.ApplicationUser> usm = scope.ServiceProvider
                     .GetService<UserManager<Models.Database.ApplicationUser>>();
 
-                var moderator = new Models.Database.ApplicationUser() { Email = AdminEmail, UserName = AdminEmail };
+                Models.Database.ApplicationUser moderator = new Models.Database.ApplicationUser() { Email = AdminEmail, UserName = AdminEmail };
 
                 usm.CreateAsync(moderator, AdminPassword)
                     .GetAwaiter()
@@ -208,7 +218,7 @@
                     .GetResult()
                     .VerifyIdentityResult();
             }
-            
+
             int actualArticlesCount;
             int expectedArticlesCount;
             using (ChromeDriver driver = new ChromeDriver(this.executingDirectorty))
@@ -229,7 +239,7 @@
 
             using (IServiceScope scope = this.webHost.Services.CreateScope())
             {
-                var applicationDbContext = scope.ServiceProvider
+                IApplicationDbContext applicationDbContext = scope.ServiceProvider
                     .GetService<IApplicationDbContext>();
 
                 expectedArticlesCount = applicationDbContext.Articles.AsNoTracking()
@@ -248,6 +258,31 @@
             {
                 throw new Exception(string.Join(Environment.NewLine, result.Errors.Select(x => x.Description)));
             }
+        }
+    }
+
+    public class NoReloadVerificationContext : IDisposable
+    {
+        private readonly IWebElement bodyElement;
+        public NoReloadVerificationContext(IWebDriver webDriver)
+        {
+            this.bodyElement = webDriver.FindElement(By.TagName("body"));
+            
+        }
+
+        public void Dispose() => MyAssert.DoesNotThrow(() => this.bodyElement.Enabled);
+    }
+
+    public class MyAssert : Assert
+    {
+        public static void DoesNotThrow(Func<object> func)
+        {
+            func();
+        }
+
+        public static void DoesNotThrow(Action action)
+        {
+            action();
         }
     }
 }

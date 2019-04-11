@@ -13,6 +13,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     using OpenDevBlog.Data;
+    using OpenDevBlog.Data.Data.Repositories;
     using OpenDevBlog.Models.Database;
 
     public class Startup
@@ -42,6 +43,8 @@
             });
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddTransient(typeof(OpenDevBlog.Services.ArticlesService));
 
             services.AddDefaultIdentity<ApplicationUser>()
                 .AddRoles<IdentityRole>()
