@@ -22,4 +22,10 @@
     <ProjectReference Include="..\OpenDevBlog.Web\OpenDevBlog.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

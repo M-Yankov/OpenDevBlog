@@ -1,0 +1,65 @@
+﻿@model OpenDevBlog.Web.Models.Articles.ArticleCreateModel
+@{
+    ViewData["Title"] = "Create Article";
+}
+
+<h1>Create article</h1>
+
+<form asp-action="create" method="post">
+    <div class="row">
+        <div class="col">
+            <label>
+                Title:
+                <input asp-for="Title" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </label>
+            <div id="container" style="height:300px; border:1px solid grey"></div>
+            <label>
+                Email:
+                <input asp-for="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </label>
+            <label>
+                Names:
+                <input asp-for="Names" />
+                <span asp-validation-for="Names" class="text-danger"></span>
+            </label>
+            <div class="float-right">
+                <button id="btn-preview" class="btn btn-outline-primary" type="button">Preview</button>
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+        <div class="col">
+            <div>
+                <h3>Preview:</h3>
+            </div>
+            <div id="preview"></div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @* Order is important *@
+    <partial name="_ValidationScriptsPartial" />
+    <script src="~/lib/monaco-editor/dist/min/vs/loader.js"></script>
+    <script>
+        var editor;
+        require.config({ paths: { 'vs': '/lib/monaco-editor/dist/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            var editorOptions = {
+                value: '<div> Hello World article! </div>',
+                language: 'html',
+
+            };
+
+            editor = monaco.editor.create(document.getElementById('container'), editorOptions);
+            $(editor.getDomNode()).find('textarea').attr('name', 'Content');
+        });
+
+        document.getElementById('btn-preview').addEventListener('click', function () {
+            var html = editor.getValue();
+            var previewPanel = document.getElementById('preview');
+            previewPanel.innerHTML = html;
+        });
+    </script>
+}
