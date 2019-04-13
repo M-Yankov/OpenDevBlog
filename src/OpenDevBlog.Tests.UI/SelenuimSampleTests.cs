@@ -30,6 +30,7 @@
 
         private readonly string executingDirectorty;
         private readonly IWebHost webHost;
+
         public SelenuimSampleTests()
         {
             this.tokenSource = new CancellationTokenSource();
@@ -158,10 +159,11 @@
                 driver.Navigate().GoToUrl(uriBuilder.ToString());
 
                 IWebElement articlesContainer = driver.FindElementByClassName("articles-list");
-                ReadOnlyCollection<IWebElement> articleElements = articlesContainer.FindElements(By.ClassName("article-item"));
+                ReadOnlyCollection<IWebElement> articleElements = articlesContainer
+                    .FindElements(By.ClassName("article-item"));
 
-                IEnumerable<string> actualTitles = articleElements.Select(e =>
-                         e.FindElement(By.ClassName("article-title")).Text);
+                IEnumerable<string> actualTitles = articleElements
+                    .Select(e => e.FindElement(By.ClassName("article-title")).Text);
 
                 int acutualCount = articleElements.Count;
 
