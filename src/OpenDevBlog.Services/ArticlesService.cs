@@ -1,13 +1,18 @@
-﻿
-namespace OpenDevBlog.Services
+﻿namespace OpenDevBlog.Services
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Microsoft.AspNetCore.Identity;
-    using Models.Database;
+    using Microsoft.EntityFrameworkCore;
+
+    using Models;
+
     using OpenDevBlog.Data.Data.Repositories;
+    using OpenDevBlog.Models.Database;
+    using OpenDevBlog.Models.Enums;
 
     public class ArticlesService
     {
@@ -23,7 +28,7 @@ namespace OpenDevBlog.Services
             this.userManager = userManager;
         }
 
-        public async Task Create(string title, string htmlContent, string names, string email)
+        public async Task CreateAsync(string title, string htmlContent, string names, string email)
         {
             string authorUsername = $"{AnonymousUsernamePrefix}-{email}";
             ApplicationUser author = await this.userManager
@@ -55,12 +60,28 @@ namespace OpenDevBlog.Services
             {
                 Title = title,
                 Content = htmlContent,
-                Status = Models.Enums.ArticleStatus.Pending,
+                Status = ArticleStatus.Pending,
                 AuthorId = author.Id
             };
 
             await this.articlesRepository.AddAsync(newArticle);
             await this.articlesRepository.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<ArticleModel>> GetLatestArticlesAsync() => 
+            await this.articlesRepository
+                .GetAll()
+                .Include(x => x.Author)
+                .Where(x => x.Status == ArticleStatus.Approved)
+                .Select(x => new ArticleModel()
+                {
+                    Content = x.Content,
+                    CreatedBy = x.Author.Name,
+                    Id = x.Id,
+                    CreatedOn = x.CreatedOn,
+                    Title = x.Title
+                })
+                .Take(20)
+                .ToListAsync();
     }
 }
