@@ -1,29 +1,27 @@
-﻿@model IEnumerable<OpenDevBlog.Web.Models.Articles.ArticleViewModel>
+﻿@model IEnumerable<ArticleViewModel>
+@{
+    ViewData["Title"] = "Recent articles";
+}
 
 <div>
     <h2>Most recent titles</h2>
 </div>
 
 <div class="articles-list">
-@foreach(var article in this.Model)
-{
-    IDictionary<string, string> routeData = new Dictionary<string, string>()
+    @foreach (var article in this.Model)
     {
-        { "id", article.Id.ToString() }
-    };
-
-    <div class="article-item">
-        <div class="article-title">
-            <h3>@article.Title</h3>
+        <div class="article-item">
+            <div class="article-title">
+                <h3>@article.Title</h3>
+            </div>
+            <div class="article-summary">
+                @Html.Raw(article.Summary)
+            </div>
+            <div class="article-details-link">
+                <a asp-action="Details" asp-route-id="@article.Id">
+                    See more
+                </a>
+            </div>
         </div>
-        <div class="article-summary">
-            @Html.Raw(article.Summary)
-        </div>
-        <div class="article-details-link">
-            <a asp-action="Details" asp-route-id="@article.Id" >
-                See more
-            </a>
-        </div>
-    </div>
-}
+    }
 </div>

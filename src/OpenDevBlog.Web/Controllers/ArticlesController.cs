@@ -3,9 +3,10 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
-    using OpenDevBlog.Data;
+    using OpenDevBlog.Models.Enums;
     using OpenDevBlog.Services;
     using OpenDevBlog.Web.Mappings;
     using OpenDevBlog.Web.Models.Articles;
@@ -13,17 +14,13 @@
     public class ArticlesController : Controller
     {
         private readonly ArticlesService articlesService;
-        private readonly ApplicationDbContext applicationDbContext;
 
-        public ArticlesController(ArticlesService articlesService, ApplicationDbContext applicationDbContext)
-        {
-            this.applicationDbContext = applicationDbContext;
+        public ArticlesController(ArticlesService articlesService) =>
             this.articlesService = articlesService;
-        }
 
         [HttpGet]
         public async Task<IActionResult> Index() =>
-           this.View((await this.articlesService.GetLatestArticlesAsync())
+           this.View((await this.articlesService.GetAll(ArticleStatus.Approved))
                 .Select(x => x.ToViewModel()));
 
         [HttpGet]
@@ -51,5 +48,12 @@
 
         [HttpGet]
         public IActionResult Details(int id) => this.View();
+
+        [HttpGet]
+        [Area("Identity")]
+        [Authorize(Roles = "Moderator")]
+        public async Task<IActionResult> Review() =>
+            this.View((await this.articlesService.GetAll(ArticleStatus.Pending))
+                .Select(x => x.ToViewModel()));
     }
 }

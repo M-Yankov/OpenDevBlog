@@ -68,11 +68,11 @@
             await this.articlesRepository.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ArticleModel>> GetLatestArticlesAsync() => 
+        public async Task<IEnumerable<ArticleModel>> GetAll(ArticleStatus status) => 
             await this.articlesRepository
                 .GetAll()
                 .Include(x => x.Author)
-                .Where(x => x.Status == ArticleStatus.Approved)
+                .Where(x => x.Status == status)
                 .Select(x => new ArticleModel()
                 {
                     Content = x.Content,
