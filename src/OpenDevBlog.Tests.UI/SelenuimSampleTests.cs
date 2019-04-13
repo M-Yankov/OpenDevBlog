@@ -227,16 +227,19 @@
             {
                 UriBuilder uriBuilder = new UriBuilder(TestLocalHostUrl);
                 uriBuilder.Path = "/Identity/Account/Login";
-                driver.Navigate().GoToUrl(uriBuilder.ToString());
+                driver.Navigate().GoToUrl(uriBuilder.Uri);
 
                 driver.FindElementById("Input_Email").SendKeys(AdminEmail);
                 driver.FindElementById("Input_Password").SendKeys(AdminPassword);
 
                 driver.FindElementByCssSelector("[type=submit]").Click();
 
-                driver.Navigate().GoToUrl("/Identity/Account/Articles/Review");
+                UriBuilder reviewArticlesUrl = new UriBuilder(TestLocalHostUrl);
+                reviewArticlesUrl.Path = "/Identity/Articles/Review";
+                
+                driver.Navigate().GoToUrl(reviewArticlesUrl.Uri);
 
-                actualArticlesCount = driver.FindElementsByCssSelector("#articles-for-review tr").Count;
+                actualArticlesCount = driver.FindElementsByCssSelector("table tbody tr").Count;
             }
 
             using (IServiceScope scope = this.webHost.Services.CreateScope())

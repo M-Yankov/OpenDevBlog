@@ -1,0 +1,31 @@
+﻿@model IEnumerable<OpenDevBlog.Web.Models.Articles.ArticleViewModel>
+
+<h2>
+    Articles awaiting approval
+</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Created date</th>
+            <th>Created by</th>
+            <th>Actions:</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var article in this.Model)
+        {
+            <tr>
+                <td>
+                    @article.Title
+                </td>
+                <td>@article.CreatedOn.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                <td>@article.CreatedBy</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@article.Id" asp-area="Identity">View</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
