@@ -5,12 +5,15 @@
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
+    using System.Text.Encodings.Web;
     using System.Threading;
 
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Hosting.Internal;
+    using Microsoft.AspNetCore.Html;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -43,30 +46,31 @@
             this.webHost = WebHost.CreateDefaultBuilder(new string[0])
                 .UseSetting(WebHostDefaults.ApplicationKey, projectName)
                 .UseContentRoot(webProjectDirectory) // This will make appsettings.json to work.
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton(typeof(IStartup), serviceProvider =>
-                    {
-                        IHostingEnvironment hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
-                        StartupMethods startupMethods = StartupLoader.LoadMethods(
-                            serviceProvider,
-                            typeof(TestStartup),
-                            hostingEnvironment.EnvironmentName);
+                //.ConfigureServices(services =>
+                //{
+                //    services.AddSingleton(typeof(IStartup), serviceProvider =>
+                //    {
+                //        IHostingEnvironment hostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
+                //        StartupMethods startupMethods = StartupLoader.LoadMethods(
+                //            serviceProvider,
+                //            typeof(TestStartup),
+                //            hostingEnvironment.EnvironmentName);
 
-                        return new ConventionBasedStartup(startupMethods);
-                    });
-                })
+                //        return new ConventionBasedStartup(startupMethods);
+                //    });
+                //})
                 .UseEnvironment(EnvironmentName.Development)
                 .UseUrls(TestLocalHostUrl)
-                //// .UseStartup<Web.TestStartUp>() // It's not working
+                .UseStartup<TestStartup>() // It's not working
                 .Build();
 
-            this.webHost.RunAsync(this.tokenSource.Token);
+            this.webHost.StartAsync();//(this.tokenSource.Token);
         }
 
         public void Dispose()
         {
             this.tokenSource.Cancel();
+            this.webHost.StopAsync();
             this.webHost.Dispose();
         }
 
@@ -253,6 +257,106 @@
 
             Assert.Equal(expectedArticlesCount, actualArticlesCount);
         }
+
+        [Fact]
+        public void ExpectToSaveMultilineArticleContent()
+        {
+            Type enumerableType = typeof(Enumerable);
+            System.Reflection.MethodInfo[] methodInfos = enumerableType
+                .GetMethods(
+                    System.Reflection.BindingFlags.Static |
+                    System.Reflection.BindingFlags.Public);
+
+            TagBuilder container = new TagBuilder("div");
+            container.AddCssClass("container");
+            TagBuilder paragraph = new TagBuilder("p");
+            paragraph.InnerHtml.Append($"{enumerableType.FullName} contains {methodInfos.Length} methods:");
+
+
+            const string Email = "test@test.com";
+            const string ArticleTitle = "Large article";
+            using (ChromeDriver driver = new ChromeDriver(this.executingDirectorty))
+            {
+                driver.Manage().Window.Maximize();
+                UriBuilder uriBuilder = new UriBuilder(TestLocalHostUrl);
+                uriBuilder.Path = "/Articles/Create";
+                driver.Navigate().GoToUrl(uriBuilder.Uri);
+
+                IWebElement monacoEditor = driver.FindElementByCssSelector("#container textarea.inputarea");
+
+                // webElement.Clear() not working here
+                monacoEditor.SendKeys(Keys.Control + "a");
+                monacoEditor.SendKeys(Keys.Backspace);
+
+                monacoEditor.SendKeys(container.RenderStartTag().GetContent());
+                monacoEditor.SendKeys(Keys.Enter);
+                monacoEditor.SendKeys(paragraph.GetContent());
+                monacoEditor.SendKeys(Keys.Escape + Keys.Enter);
+                
+                TagBuilder list = new TagBuilder("ul");
+                monacoEditor.SendKeys(list.RenderStartTag().GetContent());
+                monacoEditor.SendKeys(Keys.Enter);
+                for (int i = 0; i < methodInfos.Length && i < 20; i++)
+                {
+                    TagBuilder listItem = new TagBuilder("li");
+                    monacoEditor.SendKeys(listItem.RenderStartTag().GetContent());
+                    monacoEditor.SendKeys(Keys.Enter);
+
+                    TagBuilder span = new TagBuilder("span");
+                    span.InnerHtml.Append(methodInfos[i].ReflectedType.Namespace);
+
+                    listItem.InnerHtml.AppendHtml(span);
+                    listItem.InnerHtml.Append($".{methodInfos[i].Name}");
+                    IEnumerable<string> parameterTypes = methodInfos[i]
+                        .GetParameters()
+                        .Select(x => x.ParameterType.Name);
+
+                    string methodParameters = string.Join(", ", parameterTypes);
+                    listItem.InnerHtml.Append($"({methodParameters})");
+                    monacoEditor.SendKeys(listItem.RenderBody().GetContent());
+                    monacoEditor.SendKeys(Keys.Escape);
+                    monacoEditor.SendKeys(Keys.Enter);
+                    monacoEditor.SendKeys(Keys.Backspace);
+                    monacoEditor.SendKeys(listItem.RenderEndTag().GetContent());
+
+                    monacoEditor.SendKeys(Keys.Escape);
+                    monacoEditor.SendKeys(Keys.Enter);
+                    list.InnerHtml.AppendHtml(listItem);
+                }
+
+                container.InnerHtml.AppendHtml(paragraph);
+                container.InnerHtml.AppendHtml(list);
+
+                monacoEditor.SendKeys(list.RenderEndTag().GetContent());
+                monacoEditor.SendKeys(Keys.Escape);
+                monacoEditor.SendKeys(Keys.Enter);
+                monacoEditor.SendKeys(container.RenderEndTag().GetContent());
+                monacoEditor.SendKeys(Keys.Escape);
+                monacoEditor.SendKeys(Keys.Enter);
+
+                driver.FindElementByCssSelector($"[name={nameof(ArticleCreateModel.Title)}]").SendKeys(ArticleTitle);
+                driver.FindElementByCssSelector($"[name={nameof(ArticleCreateModel.Email)}]").SendKeys(Email);
+                driver.FindElementByCssSelector($"[name={nameof(ArticleCreateModel.Names)}]").SendKeys("Testing with selenium");
+
+                driver.FindElementByCssSelector("form input[type=submit]").Click();
+            }
+
+            string fullHtml = container.GetContent();
+
+            Models.Database.Article article = null;
+            using (IServiceScope scope = this.webHost.Services.CreateScope())
+            {
+                article = scope.ServiceProvider
+                    .GetService<IApplicationDbContext>().Articles.AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Title == ArticleTitle)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+
+            Assert.NotNull(article);
+            string actualHtml = article.Content.Trim().Replace(Environment.NewLine, string.Empty);
+            Assert.Equal(fullHtml, actualHtml);
+        }
     }
 
     public static class IdentityResultExtensions
@@ -288,6 +392,21 @@
         public static void DoesNotThrow(Action action)
         {
             action();
+        }
+    }
+
+    public static class IHtmlContentExtensions
+    {
+        public static string GetContent(this IHtmlContent htmlContent)
+        {
+            string html = string.Empty;
+            using (StringWriter htmlWriter = new StringWriter())
+            {
+                htmlContent.WriteTo(htmlWriter, HtmlEncoder.Default);
+                html = htmlWriter.ToString();
+            }
+
+            return html;
         }
     }
 }
