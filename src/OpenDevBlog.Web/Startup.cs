@@ -13,6 +13,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     using OpenDevBlog.Data;
+    using OpenDevBlog.Data.Data.Repositories;
     using OpenDevBlog.Models.Database;
 
     public class Startup
@@ -42,8 +43,11 @@
             });
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            services.AddTransient(typeof(OpenDevBlog.Services.ArticlesService));
 
             services.AddDefaultIdentity<ApplicationUser>()
+                .AddRoles<IdentityRole>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -62,7 +66,9 @@
             {
                 app.UseExceptionHandler("/Home/Error");
 
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // The default HSTS value is 30 days.
+                // You may want to change this for production scenarios.
+                // see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
                 app.UseHttpsRedirection();
             }
@@ -84,6 +90,10 @@
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "areas",
+                    template: "{area:exists}/{controller}/{action}/{id?}");
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
